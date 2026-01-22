@@ -1,0 +1,30 @@
+{
+  "name": "@shopify-automation/root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered Shopify Store Management Platform",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "db:migrate": "cd apps/dashboard && npx prisma migrate dev",
+    "db:generate": "cd apps/dashboard && npx prisma generate",
+    "db:studio": "cd apps/dashboard && npx prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.1"
+}

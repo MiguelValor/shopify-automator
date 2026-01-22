@@ -1,0 +1,37 @@
+# Use Node.js 18 Alpine for smaller image size
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install pnpm globally
+RUN npm install -g pnpm@8.15.1
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma/
+
+# Install ALL dependencies (needed for build)
+RUN pnpm install --frozen-lockfile
+
+# Copy application code
+COPY . .
+
+# Generate Prisma client
+RUN pnpm prisma generate
+
+# Build the application
+RUN pnpm run build
+
+# Remove dev dependencies after build
+RUN pnpm prune --prod
+
+# Set environment to production
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# Expose port 8080 (Cloud Run default)
+EXPOSE 8080
+
+# Start the application
+CMD ["pnpm", "run", "start"]

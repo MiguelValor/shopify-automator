@@ -1,0 +1,324 @@
+AI-Powered Shopify Automation Platform
+Project Structure
+================================================================================
+
+prototype 01/
+│
+├── 📄 Documentation (READ THESE FIRST)
+│   ├── INDEX.md                      ⭐ Start here - Documentation guide
+│   ├── QUICK_START.md                ⚡ 5-minute setup guide
+│   ├── README.md                     📖 Project overview
+│   ├── ARCHITECTURE.md               🏗️  System architecture diagrams
+│   ├── FINAL_SETUP.md               🛠️  Complete setup & deployment
+│   ├── IMPLEMENTATION_GUIDE.md       💻 Implementation patterns
+│   ├── PROJECT_SUMMARY.md            📊 What was built
+│   └── PROJECT_STRUCTURE.txt         📂 This file
+│
+├── ⚙️  Configuration Files
+│   ├── package.json                  Root package configuration
+│   ├── pnpm-workspace.yaml           Workspace configuration
+│   ├── turbo.json                    Build system configuration
+│   ├── .gitignore                    Git ignore rules
+│   └── setup-services.sh             Setup automation script
+│
+├── 📱 apps/ - Application Layer
+│   │
+│   ├── dashboard/                    Main Shopify Remix App
+│   │   ├── prisma/
+│   │   │   └── schema.prisma        ✅ 11 models defined
+│   │   ├── app/
+│   │   │   ├── routes/              To implement (Remix routes)
+│   │   │   ├── components/          To implement (React components)
+│   │   │   ├── lib/
+│   │   │   │   └── services/        To implement (API clients)
+│   │   │   └── graphql/             To implement (Shopify GraphQL)
+│   │   ├── package.json
+│   │   └── .env.example             Environment variables template
+│   │
+│   └── worker/                       Background Job Processor
+│       ├── src/
+│       │   ├── index.ts             Template provided in FINAL_SETUP.md
+│       │   ├── queue/               Job queue management
+│       │   └── jobs/                Job definitions
+│       │       ├── product-scan-job.ts
+│       │       ├── inventory-forecast-job.ts
+│       │       ├── price-monitor-job.ts
+│       │       ├── image-process-job.ts
+│       │       └── approval-expiry-job.ts
+│       └── package.json
+│
+├── 🔧 services/ - Microservices Layer
+│   │
+│   ├── product-ai/                   ✅ FULLY IMPLEMENTED (Port 3001)
+│   │   ├── src/
+│   │   │   ├── index.ts             Express server with 11 endpoints
+│   │   │   └── generators/
+│   │   │       ├── seo-generator.ts       SEO meta tags
+│   │   │       ├── description-generator.ts Product descriptions
+│   │   │       └── tags-generator.ts      Product tags
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── .env.example
+│   │
+│   ├── inventory-ai/                 ✅ FULLY IMPLEMENTED (Port 3002)
+│   │   ├── src/
+│   │   │   ├── index.ts             Express server with 7 endpoints
+│   │   │   ├── forecasting/
+│   │   │   │   └── demand-forecaster.ts   Demand forecasting
+│   │   │   └── calculators/
+│   │   │       └── reorder-calculator.ts  Reorder calculations
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── .env.example
+│   │
+│   ├── workflow-engine/              ✅ FULLY IMPLEMENTED (Port 3003)
+│   │   ├── src/
+│   │   │   ├── index.ts             Express server with 4 endpoints
+│   │   │   └── engine/
+│   │   │       └── approval-manager.ts    Approval workflows
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── .env.example
+│   │
+│   ├── pricing-ai/                   📝 TEMPLATE PROVIDED (Port 3004)
+│   │   ├── src/
+│   │   │   ├── index.ts             Template in FINAL_SETUP.md
+│   │   │   └── strategies/
+│   │   │       ├── competitive-pricing.ts
+│   │   │       ├── demand-based-pricing.ts
+│   │   │       └── margin-based-pricing.ts
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── .env.example
+│   │
+│   └── image-ai/                     📝 TEMPLATE PROVIDED (Port 3005)
+│       ├── src/
+│       │   ├── index.ts             Template in FINAL_SETUP.md
+│       │   └── processors/
+│       │       ├── alt-text-generator.ts
+│       │       └── image-tagger.ts
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── .env.example
+│
+└── 📦 packages/ - Shared Libraries
+    │
+    ├── types/                        ✅ FULLY IMPLEMENTED
+    │   ├── src/
+    │   │   └── index.ts             Complete TypeScript interfaces
+    │   │                             - ShopifyProduct
+    │   │                             - SEOSuggestion
+    │   │                             - ProductOptimization
+    │   │                             - InventoryForecast
+    │   │                             - PricingStrategy
+    │   │                             - PriceOptimization
+    │   │                             - ImageOptimization
+    │   │                             - AutomationRule
+    │   │                             - ApprovalQueue
+    │   │                             - BackgroundJob
+    │   │                             - ServiceResponse
+    │   ├── package.json
+    │   └── tsconfig.json
+    │
+    └── ai-core/                      ✅ FULLY IMPLEMENTED
+        ├── src/
+        │   └── index.ts              Gemini AI client
+        │                              - GeminiClient class
+        │                              - generateText()
+        │                              - generateStructuredJSON()
+        │                              - analyzeImage()
+        │                              - PromptTemplates:
+        │                                • generateSEO
+        │                                • generateDescription
+        │                                • suggestTags
+        │                                • generateAltText
+        │                                • forecastDemand
+        │                                • calculatePrice
+        ├── package.json
+        └── tsconfig.json
+
+================================================================================
+IMPLEMENTATION STATUS
+================================================================================
+
+✅ COMPLETED (Ready to Use):
+  • Database Schema - 11 models with relationships
+  • @shopify-automation/types - All TypeScript interfaces
+  • @shopify-automation/ai-core - Gemini client + prompts
+  • Product-AI Service - SEO, descriptions, tags (11 endpoints)
+  • Inventory-AI Service - Forecasting, reorder calc (7 endpoints)
+  • Workflow Engine - Approval workflows (4 endpoints)
+  • Complete Documentation Suite - 6 comprehensive guides
+
+📝 TEMPLATES PROVIDED (2-4 hours to implement):
+  • Pricing-AI Service - Dynamic pricing strategies
+  • Image-AI Service - Alt text generation
+  • Worker Service - Background job processor with cron
+
+🎨 TO IMPLEMENT (8-12 hours):
+  • Dashboard UI Routes - Remix routes for Shopify app
+  • Dashboard Components - React components with Polaris
+  • Service Clients - API client wrappers
+
+🔌 TO INTEGRATE (4-6 hours):
+  • Shopify OAuth - Authentication flow
+  • Shopify GraphQL - Mutations for product/price/inventory updates
+  • Shopify Webhooks - Real-time product change notifications
+
+================================================================================
+QUICK COMMANDS
+================================================================================
+
+# Setup
+cd "/Users/MiguelValor/Documents/prototype 01"
+pnpm install
+cd packages/types && pnpm build
+cd ../ai-core && pnpm build
+cd ../../apps/dashboard && npx prisma migrate dev
+
+# Start Services
+cd services/product-ai && pnpm dev       # Terminal 1 (Port 3001)
+cd services/inventory-ai && pnpm dev     # Terminal 2 (Port 3002)
+cd services/workflow-engine && pnpm dev  # Terminal 3 (Port 3003)
+
+# Health Checks
+curl http://localhost:3001/health
+curl http://localhost:3002/health
+curl http://localhost:3003/health
+
+# Database Management
+cd apps/dashboard
+npx prisma studio                        # Open database viewer
+npx prisma generate                      # Regenerate Prisma client
+npx prisma migrate dev                   # Create new migration
+
+================================================================================
+DATABASE SCHEMA (11 Models)
+================================================================================
+
+┌─────────────────┐
+│     Shop        │  Store configuration
+├─────────────────┤
+│ id              │
+│ shopDomain      │
+│ automationEnabled│
+└─────────────────┘
+        │
+        ├── AutomationRule       (Trigger-based automation)
+        ├── ProductOptimization  (AI product suggestions)
+        ├── InventoryForecast    (Demand forecasts)
+        ├── PricingRule          (Pricing strategies)
+        ├── ImageOptimization    (Image improvements)
+        └── ApprovalQueue        (Approval workflow)
+
+Additional Models:
+  • Session             (Shopify auth)
+  • PriceOptimization   (Price suggestions)
+  • CompetitorPrice     (Competitor data)
+  • BackgroundJob       (Job tracking)
+
+================================================================================
+API ENDPOINTS (25+)
+================================================================================
+
+Product-AI (Port 3001):
+  POST /generate-seo               Generate SEO metadata
+  POST /generate-seo/bulk          Bulk SEO generation
+  POST /validate-seo               Validate SEO
+  POST /generate-description       Generate descriptions
+  POST /enhance-description        Enhance existing
+  POST /generate-features          Extract features
+  POST /suggest-tags               Suggest tags
+  POST /merge-tags                 Merge tag lists
+  POST /categorize-tags            Categorize tags
+  POST /validate-tags              Validate tags
+  POST /bulk-optimize              Bulk optimization
+
+Inventory-AI (Port 3002):
+  POST /forecast-demand            Demand forecasting
+  POST /calculate-reorder          Reorder point
+  POST /calculate-safety-stock     Safety stock
+  POST /calculate-eoq              Economic Order Quantity
+  POST /detect-seasonality         Seasonality detection
+  POST /stockout-probability       Stockout risk
+
+Workflow Engine (Port 3003):
+  POST /create-approval            Create approval
+  POST /approvals/:id/approve      Approve item
+  POST /approvals/:id/reject       Reject item
+  GET  /approvals/pending/:shopId  Get pending
+
+================================================================================
+TECHNOLOGY STACK
+================================================================================
+
+Runtime:        Node.js 18+
+Language:       TypeScript 5.3+
+Package Mgr:    pnpm 8+
+Build System:   Turbo
+Database:       PostgreSQL + Prisma ORM
+AI Provider:    Google Gemini (gemini-2.0-flash-exp)
+API Framework:  Express.js
+Frontend:       Remix + Shopify Polaris (ready for implementation)
+Background:     node-cron
+
+================================================================================
+DOCUMENTATION GUIDE
+================================================================================
+
+START HERE:
+  1. INDEX.md              → Documentation navigator
+  2. QUICK_START.md        → Get running in 5 minutes
+  3. README.md             → Project overview
+
+IMPLEMENTATION:
+  4. ARCHITECTURE.md       → System design & diagrams
+  5. IMPLEMENTATION_GUIDE.md → Code patterns & examples
+  6. FINAL_SETUP.md        → Setup, testing, deployment
+
+REFERENCE:
+  7. PROJECT_SUMMARY.md    → What was built, metrics, ROI
+  8. PROJECT_STRUCTURE.txt → This file (tree structure)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Quick Start (5 min):
+   → Follow QUICK_START.md to run services locally
+   → Test all endpoints with curl commands
+   → Verify database with Prisma Studio
+
+2. Complete Services (2-4 hours):
+   → Implement Pricing-AI using template in FINAL_SETUP.md
+   → Implement Image-AI using template in FINAL_SETUP.md
+   → Implement Worker using template in FINAL_SETUP.md
+
+3. Build Dashboard (8-12 hours):
+   → Create Remix routes for all features
+   → Build approval queue UI
+   → Add analytics dashboard
+
+4. Shopify Integration (4-6 hours):
+   → Set up OAuth flow
+   → Implement GraphQL mutations
+   → Configure webhooks
+
+5. Production Deploy (4-8 hours):
+   → Deploy to cloud provider
+   → Configure environment variables
+   → Set up monitoring
+
+Total Estimated Time to Production-Ready: 20-30 hours
+
+================================================================================
+SUPPORT
+================================================================================
+
+All documentation files are in the project root directory.
+
+For specific tasks, refer to INDEX.md "Quick Reference by Task" section.
+
+Common issues are covered in QUICK_START.md and FINAL_SETUP.md.
+
+================================================================================

@@ -1,0 +1,237 @@
+// Shopify Automation Platform - Database Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Shopify App Session Management (required for Shopify App Bridge)
+model Session {
+  id          String    @id
+  shop        String
+  state       String
+  isOnline    Boolean   @default(false)
+  scope       String?
+  expires     DateTime?
+  accessToken String
+  userId      String?
+  firstName   String?
+  lastName    String?
+  email       String?
+  accountOwner Boolean  @default(false)
+  locale      String?
+  collaborator Boolean? @default(false)
+  emailVerified Boolean? @default(false)
+}
+
+// Shop-level settings and automation configuration
+model Shop {
+  id                    String    @id @default(cuid())
+  shopDomain            String    @unique
+  automationEnabled     Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  automationRules       AutomationRule[]
+  productOptimizations  ProductOptimization[]
+  inventoryForecasts    InventoryForecast[]
+  pricingRules          PricingRule[]
+  imageOptimizations    ImageOptimization[]
+  approvalQueues        ApprovalQueue[]
+}
+
+// Automation rules (e.g., "auto-generate SEO for new products")
+model AutomationRule {
+  id                String    @id @default(cuid())
+  shopId            String
+  ruleType          String    // 'seo', 'inventory', 'pricing', 'image'
+  isActive          Boolean   @default(true)
+  autoApprove       Boolean   @default(false)
+  trigger           String    // JSON: { event: 'product.created', conditions: {} }
+  actions           String    // JSON: [{ type: 'generate_description' }]
+  priority          Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  shop              Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, ruleType])
+}
+
+// Track all AI-generated product optimizations
+model ProductOptimization {
+  id                String    @id @default(cuid())
+  shopId            String
+  shopifyProductId  String
+  optimizationType  String    // 'description', 'seo', 'title', 'tags'
+  status            String    // 'pending', 'approved', 'rejected', 'applied'
+  originalValue     String?   // JSON of original data
+  suggestedValue    String    // JSON of AI suggestions
+  appliedValue      String?
+  confidence        Float?    // 0-1 AI confidence
+  aiModel           String    // 'gemini-pro'
+  generatedAt       DateTime  @default(now())
+  reviewedAt        DateTime?
+  reviewedBy        String?
+  appliedAt         DateTime?
+
+  shop              Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, shopifyProductId])
+  @@index([status])
+}
+
+// Inventory demand forecasting data
+model InventoryForecast {
+  id                  String    @id @default(cuid())
+  shopId              String
+  shopifyProductId    String
+  shopifyVariantId    String?
+  currentStock        Int
+  forecastedDemand    Float     // Units per day
+  reorderPoint        Int
+  optimalStock        Int
+  daysUntilStockout   Int?
+  seasonalityFactor   Float     @default(1.0)
+  trendFactor         Float     @default(1.0)
+  confidence          Float?
+  forecastPeriodDays  Int       @default(30)
+  calculatedAt        DateTime  @default(now())
+  nextReviewAt        DateTime
+
+  shop                Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, shopifyProductId])
+  @@index([nextReviewAt])
+}
+
+// Pricing rules and strategies
+model PricingRule {
+  id                  String    @id @default(cuid())
+  shopId              String
+  ruleName            String
+  isActive            Boolean   @default(true)
+  strategy            String    // 'competitive', 'demand_based', 'margin_based'
+  targetMarginMin     Float?
+  targetMarginMax     Float?
+  priceFloorPercent   Float?
+  priceCeilingPercent Float?
+  competitorWeight    Float     @default(0.3)
+  demandWeight        Float     @default(0.4)
+  inventoryWeight     Float     @default(0.3)
+  productFilter       String?   // JSON: { tags: [], vendor: '' }
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  shop                Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  priceOptimizations  PriceOptimization[]
+
+  @@index([shopId, isActive])
+}
+
+// Price change suggestions
+model PriceOptimization {
+  id                  String    @id @default(cuid())
+  pricingRuleId       String
+  shopifyProductId    String
+  shopifyVariantId    String
+  currentPrice        Float
+  suggestedPrice      Float
+  priceChange         Float
+  priceChangePercent  Float
+  reasoning           String    // JSON: { competitor_avg: X, demand: Y }
+  status              String    // 'pending', 'approved', 'rejected', 'applied'
+  confidence          Float?
+  generatedAt         DateTime  @default(now())
+  reviewedAt          DateTime?
+  appliedAt           DateTime?
+
+  pricingRule         PricingRule @relation(fields: [pricingRuleId], references: [id], onDelete: Cascade)
+
+  @@index([pricingRuleId, status])
+}
+
+// Track competitor pricing data
+model CompetitorPrice {
+  id                  String    @id @default(cuid())
+  shopId              String
+  shopifyProductId    String
+  competitorName      String
+  competitorUrl       String?
+  competitorPrice     Float
+  currency            String    @default("USD")
+  scrapedAt           DateTime  @default(now())
+  isAvailable         Boolean   @default(true)
+
+  @@index([shopifyProductId, scrapedAt])
+}
+
+// Image optimization queue
+model ImageOptimization {
+  id                  String    @id @default(cuid())
+  shopId              String
+  shopifyProductId    String
+  shopifyImageId      String
+  imageUrl            String
+  optimizationType    String    // 'alt_text', 'tags', 'quality'
+  status              String    // 'queued', 'processing', 'completed', 'failed'
+  originalAltText     String?
+  suggestedAltText    String?
+  aiTags              String?   // JSON array
+  processedImageUrl   String?
+  errorMessage        String?
+  queuedAt            DateTime  @default(now())
+  processedAt         DateTime?
+
+  shop                Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, status])
+}
+
+// Central approval queue for semi-automated actions
+model ApprovalQueue {
+  id                  String    @id @default(cuid())
+  shopId              String
+  actionType          String    // 'product_update', 'price_change', 'inventory_adjust'
+  entityType          String    // 'product', 'variant'
+  entityId            String    // Shopify ID
+  currentData         String    // JSON snapshot
+  proposedData        String    // JSON of changes
+  reasoning           String?
+  confidence          Float?
+  priority            Int       @default(0)
+  status              String    // 'pending', 'approved', 'rejected', 'expired'
+  createdAt           DateTime  @default(now())
+  expiresAt           DateTime?
+  reviewedAt          DateTime?
+  reviewedBy          String?
+  reviewNotes         String?
+
+  shop                Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, status])
+  @@index([expiresAt])
+}
+
+// Background job tracking
+model BackgroundJob {
+  id                  String    @id @default(cuid())
+  jobType             String    // 'product_scan', 'inventory_forecast', 'price_monitor'
+  shopId              String?
+  status              String    // 'queued', 'running', 'completed', 'failed'
+  payload             String?   // JSON
+  progress            Int       @default(0)
+  result              String?
+  errorMessage        String?
+  attempts            Int       @default(0)
+  maxAttempts         Int       @default(3)
+  scheduledAt         DateTime  @default(now())
+  startedAt           DateTime?
+  completedAt         DateTime?
+
+  @@index([status, scheduledAt])
+  @@index([shopId, jobType])
+}
